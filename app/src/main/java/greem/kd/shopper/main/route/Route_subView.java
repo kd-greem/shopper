@@ -1,5 +1,6 @@
 package greem.kd.shopper.main.route;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -310,10 +311,11 @@ public class Route_subView extends Fragment {
         }
     }
 
-    public void addCustDetails(String [][] customer_daily){
+    public void addCustDetails(String CustomerID,String [][] customer_daily){
 
         Intent myIntent1 = new Intent(rootView.getContext(), Customerdailyproduct.class);
         myIntent1.putExtra("layout", R.layout.custdailyinfo);
+        myIntent1.putExtra("Custid", CustomerID);
         Bundle mBundle = new Bundle();
 
         mBundle.putSerializable("custDaily", customer_daily);
@@ -452,14 +454,18 @@ public class Route_subView extends Fragment {
 
     class InnerBgTask4CustDaily extends AsyncTask<String,Void,String[][]> {
         Context ctx;
-        private String[][] customer_daily = new String[9][];
+        private String[][] customer_daily = new String[10][];
         private String customerId="1";
         String url_cust_daily ="http://avinashkumbhar.com/Dairy/getCustomerDailyProdcut1.php";
         private boolean ifDataAvailble=false;
+        private final ProgressDialog dialog = new ProgressDialog(getContext());
+
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            this.dialog.setMessage("In Progress . . . ");
+            this.dialog.show();
         }
 
         @Override
@@ -529,7 +535,7 @@ public class Route_subView extends Fragment {
 
 //            JSONObject jsonObj = new JSONObject(myJSON.substring(myJSON.indexOf("{"), myJSON.lastIndexOf("}") + 1));
             Log.d("kd json len", "" + jsonArry.length());
-            for(int k=0;k<9;k++)
+            for(int k=0;k<10;k++)
               customer_daily[k] = new String[jsonArry.length()];
 
             for(int i=0;i<jsonArry.length();i++){
@@ -545,6 +551,7 @@ public class Route_subView extends Fragment {
                 customer_daily[StaticConfig.daily_route][i] = c.getString("route");
                 customer_daily[StaticConfig.daily_trip][i] = c.getString("Trip");
                 customer_daily[StaticConfig.daily_Contact][i] = c.getString("Contact");
+                customer_daily[StaticConfig.daily_MilkSr][i] = c.getString("Sr");
                 //Log.d("kd data", "" + sr +" "+ CustName);
             }
 /*
@@ -565,8 +572,9 @@ public class Route_subView extends Fragment {
         @Override
         protected void onPostExecute(String[][] result) {
             super.onPostExecute(result);
+            this.dialog.dismiss();
 //            setSpinnerValues();
-            addCustDetails(result);
+            addCustDetails(customerId,result);
             Log.d("kd.greem","in post execute r="+getRoutenum());
         }
     }

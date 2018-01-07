@@ -21,5 +21,7 @@ public final class StaticConfig {
     public static int daily_route=6;
     public static int daily_trip=7;
     public static int daily_Contact=8;
+    public static int daily_MilkSr=9;
+
 
 }

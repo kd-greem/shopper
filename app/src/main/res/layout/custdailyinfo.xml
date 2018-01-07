@@ -218,14 +218,14 @@
         android:id="@+id/lbl_totalAmount2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/editText"
+        android:layout_alignTop="@+id/txt_paidamount"
         android:layout_toEndOf="@+id/view4"
         android:text="16000.00"
         android:textSize="16sp"
         android:textStyle="bold" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/txt_paidamount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/button"
@@ -233,6 +233,7 @@
         android:layout_below="@+id/lbl_total"
         android:layout_toStartOf="@+id/view4"
         android:background="@android:color/transparent"
+        android:inputType="number"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 
