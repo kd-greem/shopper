@@ -24,4 +24,6 @@ public final class StaticConfig {
     public static int daily_MilkSr=9;
 
 
+
+
 }

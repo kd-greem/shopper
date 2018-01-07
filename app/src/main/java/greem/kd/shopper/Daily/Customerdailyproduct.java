@@ -5,11 +5,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -19,6 +22,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -31,6 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.concurrent.ExecutionException;
 
 import greem.kd.shopper.Config.StaticConfig;
 import greem.kd.shopper.R;
@@ -40,7 +45,7 @@ import greem.kd.shopper.R;
  */
 
 public class Customerdailyproduct extends AppCompatActivity  {
-    private TableLayout tl;
+    public TableLayout tl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +54,9 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         setContentView(R.layout.custdailyinfo);
         Bundle extras = getIntent().getExtras();
-        String CustId=getIntent().getStringExtra("Custid");
+        final String CustId=getIntent().getStringExtra("Custid");
 
-        String[][] customer_daily = (String[][]) extras.getSerializable("custDaily");
+        final String[][] customer_daily = (String[][]) extras.getSerializable("custDaily");
 
         Log.d("kd.greem",""+customer_daily[0].length);
         Log.d("kd.greem",""+customer_daily[0][0].length());
@@ -98,8 +103,31 @@ public class Customerdailyproduct extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
                 //do save page here
-                InnerBgTask4CustUpdateValue task = new InnerBgTask4CustUpdateValue();
-                task.execute("setCustomers","");
+
+                for(int c=1; c<tl.getChildCount();c++){
+                    TableRow row = (TableRow)tl.getChildAt(c);
+                    Log.d("kd.greem"," table row childs are "+row.getChildCount());
+
+                    EditText qty1 = (EditText) row.getChildAt(1);
+                    TextView hide= (TextView) row.getChildAt(2);
+                    String bid = hide.getText().toString();
+
+                    for(int i=0;i<customer_daily[StaticConfig.daily_MilkSr].length;i++){
+                        if(bid.equals(customer_daily[StaticConfig.daily_MilkSr][i])){
+                            InnerBgTask4CustUpdateValue task = new InnerBgTask4CustUpdateValue();
+                            try {
+                                task.execute("setCustomers",CustId, customer_daily[StaticConfig.daily_MilkSr][i],qty1.getText().toString(),
+                                        customer_daily[StaticConfig.daily_Rate][i], String.valueOf(Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]) * Float.valueOf(qty1.getText().toString())),
+                                        customer_daily[StaticConfig.daily_route][i],customer_daily[StaticConfig.daily_trip][i]).get();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
             }
         });
 
@@ -118,6 +146,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
                     TableLayout.LayoutParams.MATCH_PARENT,
                     TableLayout.LayoutParams.WRAP_CONTENT));
 
+
             TableRow.LayoutParams trlp;
             trlp =new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.WRAP_CONTENT, 1);
             trlp.setMargins(5, 15, 5, 15);
@@ -125,17 +154,26 @@ public class Customerdailyproduct extends AppCompatActivity  {
             lbl_prod.setText(customer_daily[StaticConfig.daily_Category][i]+ "-" +customer_daily[StaticConfig.daily_Sub_Category][i]);
             lbl_prod.setPadding(10, 15, 5, 15);
             lbl_prod.setTextSize(16f);
+
             lbl_prod.setBackgroundColor(Color.LTGRAY);
             lbl_prod.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
             EditText txt_qty = new EditText(this);
             txt_qty.setText(customer_daily[StaticConfig.daily_Qty][i]);
+            txt_qty.setRawInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
             txt_qty.setPadding(10, 5, 5, 5);
             txt_qty.setTextSize(16f);
+
             txt_qty.setBackgroundColor(Color.TRANSPARENT);
             txt_qty.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             tr.addView(lbl_prod,trlp );
             tr.addView(txt_qty,trlp );
+
+            TextView hide = new TextView(this);
+            hide.setText(customer_daily[StaticConfig.daily_MilkSr][i]);
+            hide.setVisibility(View.GONE);
+            tr.addView(hide,new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,TableRow.LayoutParams.WRAP_CONTENT, 0) );
+
         }
     }
 
@@ -143,15 +181,14 @@ public class Customerdailyproduct extends AppCompatActivity  {
         Context ctx;
 //        private String[][] customer_daily = new String[10][];
         private String customerId="1";
-        String url_cust_daily ="http://avinashkumbhar.com/Dairy/getCustomerDailyProdcut1.php";
+        String url_cust_daily ="http://avinashkumbhar.com/Dairy/updateCustomerDaily.php";
         private boolean ifDataAvailble=false;
-        private final ProgressDialog dialog = new ProgressDialog(getApplicationContext());
+
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            this.dialog.setMessage("Processing...");
-            this.dialog.show();
+
         }
 
         @Override
@@ -162,22 +199,22 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 if (method.equals("setCustomers")) {
                     customerId=params[1];
                     Log.d("kd in daily", "sure");
-                    return updateCustomers();
+                    return updateCustomers(params);
                 }
             }
             return "";
         }
-        private String updateCustomers(){
+        private String updateCustomers(String... param){
 
             try {
-                return getEmp_info();
+                return getEmp_info(param);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             return null;
         }
-        private String getEmp_info() throws JSONException {
+        private String getEmp_info(String... param) throws JSONException {
             String finalResult = "";
 
             try {
@@ -189,9 +226,14 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 OutputStream os = httpURLConnection.getOutputStream();
 
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                String data= URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&" +
-                            URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&" +
-                            URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&"
+                String data= URLEncoder.encode("date","UTF-8")+"="+ URLEncoder.encode("2018-01-07","UTF-8") +"&" +
+                        URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&" +
+                        URLEncoder.encode("brandid","UTF-8")+"="+ URLEncoder.encode(param[2],"UTF-8") +"&" +
+                        URLEncoder.encode("qty","UTF-8")+"="+ URLEncoder.encode(param[3],"UTF-8") +"&" +
+                        URLEncoder.encode("rate","UTF-8")+"="+ URLEncoder.encode(param[4],"UTF-8") +"&" +
+                        URLEncoder.encode("amount","UTF-8")+"="+ URLEncoder.encode(param[5],"UTF-8") +"&" +
+                        URLEncoder.encode("route","UTF-8")+"="+ URLEncoder.encode(param[6],"UTF-8") +"&" +
+                        URLEncoder.encode("trip","UTF-8")+"="+ URLEncoder.encode(param[7],"UTF-8")
                         ;
 
                 bufferedWriter.write(data);
@@ -261,7 +303,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
         @Override
         protected void onPostExecute(String  result) {
             super.onPostExecute(result);
-            dialog.dismiss();
+
 //            setSpinnerValues();
             //addCustDetails(customerId,result);
             //Log.d("kd.greem","in post execute r="+getRoutenum());
