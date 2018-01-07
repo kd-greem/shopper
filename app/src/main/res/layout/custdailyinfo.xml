@@ -2,33 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </android.support.v4.view.ViewPager>
-
-    <ImageView
-        android:id="@+id/leftNavigation"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="end"
-        android:layout_marginStart="10dp"
-        android:layout_weight="0"
-        android:gravity="center"
-        android:padding="10dp"
-        android:src="@android:drawable/btn_minus" />
-
-    <ImageView
-        android:id="@+id/rightNavigation"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="right"
-        android:layout_weight="0"
-        android:gravity="center"
-        android:padding="10dp"
-        android:src="@android:drawable/btn_plus" />
     <TextView
         android:id="@+id/txt_route"
         android:layout_width="wrap_content"
@@ -84,8 +57,9 @@
         android:id="@+id/view7"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_above="@+id/space"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/scrollView2"
+        android:layout_marginTop="2dp"
         android:background="@android:color/darker_gray" />
 
     <View
@@ -93,8 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/lbl_total2"
-        android:layout_marginTop="11dp"
+        android:layout_alignTop="@+id/button"
         android:background="@android:color/darker_gray" />
 
     <View
@@ -132,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:textSize="100sp"
+        android:textSize="80sp"
         android:textStyle="bold" />
 
     <TextView
@@ -159,9 +132,8 @@
         android:id="@+id/lbl_total2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/view2"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/view7"
-        android:layout_marginTop="29dp"
         android:text="Amount Paid : "
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -190,7 +162,8 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/space"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/view3">
+        android:layout_alignTop="@+id/view3"
+        android:id="@+id/scrollView2">
         <TableLayout
             android:id="@+id/table1"
             android:layout_width="match_parent"
@@ -236,7 +209,7 @@
         android:layout_alignBaseline="@+id/lbl_total"
         android:layout_alignBottom="@+id/lbl_total"
         android:layout_toEndOf="@+id/lbl_total2"
-        android:layout_toStartOf="@+id/txt_custphone"
+        android:layout_toStartOf="@+id/view4"
         android:text="16000.00"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -255,21 +228,20 @@
         android:id="@+id/editText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/lbl_total2"
+        android:layout_above="@+id/button"
         android:layout_alignStart="@+id/lbl_totalAmount"
-        android:layout_alignTop="@+id/lbl_total2"
-        android:layout_toStartOf="@+id/txt_custphone"
-        android:ems="10"
-        android:inputType="none"
+        android:layout_below="@+id/lbl_total"
+        android:layout_toStartOf="@+id/view4"
+        android:background="@android:color/transparent"
         android:textColor="@android:color/black"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/view4"
-        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/space"
+        android:layout_alignEnd="@+id/view4"
         android:text="Save" />
 
 </RelativeLayout>
