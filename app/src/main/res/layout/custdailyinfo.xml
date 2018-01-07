@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </android.support.v4.view.ViewPager>
+
+    <ImageView
+        android:id="@+id/leftNavigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginStart="10dp"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:padding="10dp"
+        android:src="@android:drawable/btn_minus" />
+
+    <ImageView
+        android:id="@+id/rightNavigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:padding="10dp"
+        android:src="@android:drawable/btn_plus" />
+    <TextView
+        android:id="@+id/txt_route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txt_trip"
+        android:layout_centerHorizontal="true"
+        android:text="Route -  0 "
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_trip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="23dp"
+        android:layout_toEndOf="@+id/txt_route"
+        android:text="Trip - 0"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/lbl_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txt_route"
+        android:layout_marginEnd="16dp"
+        android:layout_toStartOf="@+id/txt_route"
+        android:text="31-dec-2017"
+        android:textSize="18sp"
+        android:textStyle="normal" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txt_route"
+        android:layout_marginTop="11dp"
+        android:background="@android:color/darker_gray"
+        android:id="@+id/view" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txt_custphone"
+        android:layout_marginTop="12dp"
+        android:background="@android:color/darker_gray" />
+
+    <View
+        android:id="@+id/view7"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/space"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/darker_gray" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/lbl_total2"
+        android:layout_marginTop="11dp"
+        android:background="@android:color/darker_gray" />
+
+    <View
+        android:id="@+id/view4"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/view2"
+        android:layout_below="@+id/view7"
+        android:layout_toEndOf="@+id/txt_route"
+        android:background="@android:color/darker_gray" />
+
+    <TextView
+        android:id="@+id/lbl_cust1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/txt_trip"
+        android:layout_below="@+id/view"
+        android:text="Customer Phone"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/lbl_cust"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view"
+        android:layout_toStartOf="@+id/txt_route"
+        android:text="Customer Name"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:textSize="100sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/lbl_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/view7"
+        android:text="Total Amount : "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/lbl_total3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/view7"
+        android:text="Remaining Balance"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/lbl_total2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/view7"
+        android:layout_marginTop="29dp"
+        android:text="Amount Paid : "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_custphone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txt_custname_1"
+        android:layout_alignBottom="@+id/txt_custname_1"
+        android:layout_alignEnd="@+id/lbl_cust1"
+        android:layout_alignStart="@+id/lbl_cust1"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/txt_custname_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/lbl_cust"
+        android:layout_alignStart="@+id/lbl_cust"
+        android:layout_below="@+id/lbl_cust"
+        android:text="TextView" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/space"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/view3">
+        <TableLayout
+            android:id="@+id/table1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="1"
+                    android:background="#B0B0B0"
+                    android:text="Product"
+                    android:textAlignment="center"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="1"
+                    android:background="#B0B0B0"
+                    android:text="Quantity"
+                    android:textAlignment="center"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/lbl_totalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/lbl_total"
+        android:layout_alignBottom="@+id/lbl_total"
+        android:layout_toEndOf="@+id/lbl_total2"
+        android:layout_toStartOf="@+id/txt_custphone"
+        android:text="16000.00"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/lbl_totalAmount2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/editText"
+        android:layout_toEndOf="@+id/view4"
+        android:text="16000.00"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/lbl_total2"
+        android:layout_alignStart="@+id/lbl_totalAmount"
+        android:layout_alignTop="@+id/lbl_total2"
+        android:layout_toStartOf="@+id/txt_custphone"
+        android:ems="10"
+        android:inputType="none"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view4"
+        android:layout_centerHorizontal="true"
+        android:text="Save" />
+
+</RelativeLayout>
