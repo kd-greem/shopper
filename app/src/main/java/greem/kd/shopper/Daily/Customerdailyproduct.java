@@ -1,28 +1,22 @@
 package greem.kd.shopper.Daily;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -35,6 +29,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
 import greem.kd.shopper.Config.StaticConfig;
@@ -46,6 +42,17 @@ import greem.kd.shopper.R;
 
 public class Customerdailyproduct extends AppCompatActivity  {
     public TableLayout tl;
+    private Float remainamt;
+    private Float totalamt;
+    private Float todayamt;
+    private TextView remainamount;
+    private TextView pre_lbl;
+    private TextView today_lbl;
+    private float FinalAdditionAmt =0;
+    private TextView totalamount;
+    private String today;
+    private String total;
+    private String remain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,29 +62,50 @@ public class Customerdailyproduct extends AppCompatActivity  {
         setContentView(R.layout.custdailyinfo);
         Bundle extras = getIntent().getExtras();
         final String CustId=getIntent().getStringExtra("Custid");
+        today=getIntent().getStringExtra("today");
+        String pre=getIntent().getStringExtra("pre");
+        total=getIntent().getStringExtra("total");
+        remain=getIntent().getStringExtra("remain");
 
         final String[][] customer_daily = (String[][]) extras.getSerializable("custDaily");
 
         Log.d("kd.greem",""+customer_daily[0].length);
-        Log.d("kd.greem",""+customer_daily[0][0].length());
+        //Log.d("kd.greem",""+customer_daily[0][0].length());
+
+        TextView lblDate = (TextView) findViewById(R.id.lbl_date);
+        String formattedDate = new SimpleDateFormat("dd-MMM-yyyy").format(Calendar.getInstance().getTime());
+        lblDate.setText(formattedDate);
 
         String route=customer_daily[StaticConfig.daily_route][0];
         String trip=customer_daily[StaticConfig.daily_trip][0];
         String custName =customer_daily[StaticConfig.daily_Custname][0];
         String custphone =customer_daily[StaticConfig.daily_Contact][0];
+
         ((TextView)findViewById(R.id.txt_route)).setText(route);
         ((TextView)findViewById(R.id.txt_trip)).setText(trip);
         ((TextView)findViewById(R.id.txt_custname_1)).setText(custName);
-        ((TextView)findViewById(R.id.txt_custphone)).setText(custphone);
+
+        today_lbl=(TextView)findViewById(R.id.txt_today);
+        today_lbl.setText( today);
+        pre_lbl=(TextView)findViewById(R.id.txt_pre);
+        pre_lbl.setText(   pre);
 
         tl = (TableLayout) findViewById(R.id.table1);
 
         // Create the table row
-        setProducts(customer_daily);
 
-        final TextView totalamount=(TextView) findViewById(R.id.lbl_totalAmount);
-        final float totalamt = Float.valueOf(totalamount.getText().toString());
-        final TextView remainamount = (TextView) findViewById(R.id.lbl_totalAmount2);
+
+        totalamount=(TextView) findViewById(R.id.lbl_totalAmount);
+        totalamount.setText(total);
+
+        remainamount = (TextView) findViewById(R.id.lbl_remainAmount);
+        remainamount.setText(remain);
+
+
+        totalamt = Float.valueOf(totalamount.getText().toString());
+        todayamt =Float.valueOf(today);
+        remainamt =Float.valueOf(remain);
+
         EditText paid= (EditText) findViewById(R.id.txt_paidamount);
         paid.addTextChangedListener(new TextWatcher() {
             @Override
@@ -97,22 +125,26 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 }
             }
         });
+        setProducts(customer_daily);
 
         Button btn = (Button) findViewById(R.id.button);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //do save page here
-
                 for(int c=1; c<tl.getChildCount();c++){
                     TableRow row = (TableRow)tl.getChildAt(c);
                     Log.d("kd.greem"," table row childs are "+row.getChildCount());
 
                     EditText qty1 = (EditText) row.getChildAt(1);
+                    if(qty1.getText().length()<=0){
+                        qty1.setText("0");
+                    }
                     TextView hide= (TextView) row.getChildAt(2);
                     String bid = hide.getText().toString();
 
-                    for(int i=0;i<customer_daily[StaticConfig.daily_MilkSr].length;i++){
+                    for(int i=0;i<customer_daily[StaticConfig.daily_Custname].length;i++){
+
                         if(bid.equals(customer_daily[StaticConfig.daily_MilkSr][i])){
                             InnerBgTask4CustUpdateValue task = new InnerBgTask4CustUpdateValue();
                             try {
@@ -125,7 +157,9 @@ public class Customerdailyproduct extends AppCompatActivity  {
                                 e.printStackTrace();
                             }
                         }
+
                     }
+
                 }
 
             }
@@ -133,7 +167,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
     }
 
-    private void setProducts(String [][] customer_daily){
+    private void setProducts(final String [][] customer_daily){
 
         for(int i=0;i<customer_daily[StaticConfig.daily_Custname].length;i++){
 
@@ -158,8 +192,54 @@ public class Customerdailyproduct extends AppCompatActivity  {
             lbl_prod.setBackgroundColor(Color.LTGRAY);
             lbl_prod.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
-            EditText txt_qty = new EditText(this);
+            final EditText txt_qty = new EditText(this);
+
+            txt_qty.setSelectAllOnFocus(true);
             txt_qty.setText(customer_daily[StaticConfig.daily_Qty][i]);
+            final float rate = Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]);
+            final int currQty = Integer.valueOf(txt_qty.getText().toString());
+            final float currAmt = Float.valueOf(currQty) * Float.valueOf(rate);
+
+            txt_qty.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if(s.length()>=0) {
+                        String qty = txt_qty.getText().toString();
+                        if(qty.trim().length()<=0){
+                            qty="0";
+                        }
+                        int thisqty = Integer.valueOf(qty);
+                        if(thisqty<currQty){
+                            float change =(currQty-thisqty) *rate;
+                            remainamount.setText(String.valueOf(Float.valueOf(remain) - change ));
+                            today_lbl.setText(String.valueOf(Float.valueOf(today)-change ));
+                            totalamount.setText(String.valueOf(Float.valueOf(total)-change ));
+
+                        }else if (thisqty>currQty){
+
+                            float change =(thisqty-currQty) *rate;
+                            remainamount.setText(String.valueOf(Float.valueOf(remain) + change ));
+                            today_lbl.setText(String.valueOf(Float.valueOf(today)+change ));
+                            totalamount.setText(String.valueOf(Float.valueOf(total)+change ));
+                        }else{
+                            remainamount.setText(String.valueOf(Float.valueOf(remain) ));
+                            today_lbl.setText(String.valueOf(Float.valueOf(today) ));
+                            totalamount.setText(String.valueOf(Float.valueOf(total)));
+                        }
+
+                        //thisamt=Float.valueOf(qty) * Float.valueOf(rate);
+
+                    }
+                }
+            });
+
+
             txt_qty.setRawInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
             txt_qty.setPadding(10, 5, 5, 5);
             txt_qty.setTextSize(16f);
@@ -175,6 +255,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
             tr.addView(hide,new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,TableRow.LayoutParams.WRAP_CONTENT, 0) );
 
         }
+
     }
 
     class InnerBgTask4CustUpdateValue extends AsyncTask<String,Void,String > {
@@ -225,8 +306,10 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 Log.d("kd now", "in execut cust  daily");
                 OutputStream os = httpURLConnection.getOutputStream();
 
+                String date1=new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                String data= URLEncoder.encode("date","UTF-8")+"="+ URLEncoder.encode("2018-01-07","UTF-8") +"&" +
+                String data= URLEncoder.encode("date","UTF-8")+"="+ URLEncoder.encode(date1,"UTF-8") +"&" +
                         URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&" +
                         URLEncoder.encode("brandid","UTF-8")+"="+ URLEncoder.encode(param[2],"UTF-8") +"&" +
                         URLEncoder.encode("qty","UTF-8")+"="+ URLEncoder.encode(param[3],"UTF-8") +"&" +
@@ -235,6 +318,8 @@ public class Customerdailyproduct extends AppCompatActivity  {
                         URLEncoder.encode("route","UTF-8")+"="+ URLEncoder.encode(param[6],"UTF-8") +"&" +
                         URLEncoder.encode("trip","UTF-8")+"="+ URLEncoder.encode(param[7],"UTF-8")
                         ;
+
+                Log.d("kd.greem","Data Writing-"+ customerId +": "+ data);
 
                 bufferedWriter.write(data);
                 bufferedWriter.flush();
@@ -251,7 +336,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 }
                 finalResult = sb.toString();
 
-                Log.d("Customer info in JSON", finalResult);
                 IS.close();
 
 //            return finalResult ;
@@ -261,38 +345,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            //JSONArray jsonArry = new JSONArray(finalResult);
-
-//            JSONObject jsonObj = new JSONObject(myJSON.substring(myJSON.indexOf("{"), myJSON.lastIndexOf("}") + 1));
-//              Log.d("kd json len", "" + jsonArry.length());
-//            for(int k=0;k<10;k++)
-//                customer_daily[k] = new String[jsonArry.length()];
-//
-//            for(int i=0;i<jsonArry.length();i++){
-//                JSONObject c = jsonArry.getJSONObject(i);
-//                //Log.d("kd json ", "" + c.length());
-//
-//                customer_daily[StaticConfig.daily_Custname][i]= c.getString("Custname");
-//                customer_daily[StaticConfig.daily_Category][i] = c.getString("Category");
-//                customer_daily[StaticConfig.daily_Sub_Category][i]= c.getString("Sub_Category");
-//                customer_daily[StaticConfig.daily_Qty][i]= c.getString("Qty");
-//                customer_daily[StaticConfig.daily_Rate][i] = c.getString("Rate");
-//                customer_daily[StaticConfig.daily_Amount][i] = c.getString("Amount");
-//                customer_daily[StaticConfig.daily_route][i] = c.getString("route");
-//                customer_daily[StaticConfig.daily_trip][i] = c.getString("Trip");
-//                customer_daily[StaticConfig.daily_Contact][i] = c.getString("Contact");
-//                customer_daily[StaticConfig.daily_MilkSr][i] = c.getString("Sr");
-                //Log.d("kd data", "" + sr +" "+ CustName);
-//            }
-/*
-        ((Activity)ctx).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //stuff that updates ui
-                com.example.zs.voter_tracker.Set_Cast_Surenamewise.getInstant().setUser(contact1,description);
-            }
-        });*/
 
             return "";
         }
@@ -304,9 +356,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
         protected void onPostExecute(String  result) {
             super.onPostExecute(result);
 
-//            setSpinnerValues();
-            //addCustDetails(customerId,result);
-            //Log.d("kd.greem","in post execute r="+getRoutenum());
         }
     }
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:focusable="true"
+    android:focusedByDefault="true"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextView
@@ -49,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/txt_custphone"
+        android:layout_below="@+id/txt_pre"
         android:layout_marginTop="12dp"
         android:background="@android:color/darker_gray" />
 
@@ -80,14 +82,34 @@
         android:background="@android:color/darker_gray" />
 
     <TextView
-        android:id="@+id/lbl_cust1"
+        android:id="@+id/txt_today"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/txt_trip"
+        android:layout_alignParentEnd="true"
         android:layout_below="@+id/view"
+        android:layout_toEndOf="@+id/lbl_pre"
         android:text="Customer Phone"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/lbl_today"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txt_today"
+        android:layout_alignBottom="@+id/txt_today"
+        android:layout_alignStart="@+id/button"
+        android:layout_marginStart="38dp"
+        android:text="Today :"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/lbl_pre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/view3"
+        android:layout_alignStart="@+id/lbl_today"
+        android:text="Previous :"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/lbl_cust"
@@ -136,16 +158,17 @@
         android:layout_alignParentStart="true"
         android:text="Amount Paid : "
         android:textSize="16sp"
+
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/txt_custphone"
+        android:id="@+id/txt_pre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/txt_custname_1"
         android:layout_alignBottom="@+id/txt_custname_1"
-        android:layout_alignEnd="@+id/lbl_cust1"
-        android:layout_alignStart="@+id/lbl_cust1"
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/txt_today"
         android:text="TextView" />
 
     <TextView
@@ -215,9 +238,10 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/lbl_totalAmount2"
+        android:id="@+id/lbl_remainAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/txt_pre"
         android:layout_alignTop="@+id/txt_paidamount"
         android:layout_toEndOf="@+id/view4"
         android:text="16000.00"
@@ -234,6 +258,7 @@
         android:layout_toStartOf="@+id/view4"
         android:background="@android:color/transparent"
         android:inputType="number"
+        android:focusedByDefault="true"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 

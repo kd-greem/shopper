@@ -32,7 +32,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -175,7 +177,9 @@ public class Route_subView extends Fragment {
         String[] c=customer[StaticConfig.Route];
         for(int i=0;i<c.length;i++){
             if(c[i].equals(routenum)){
-                addCust(customer[StaticConfig.CustName][i],"1000","0",customer[StaticConfig.Trip][i],customer[StaticConfig.Sr][i]);
+                String formula="  " + customer[StaticConfig.total][i] +" + " + customer[StaticConfig.paid][i] +" = " + customer[StaticConfig.remain][i];
+                addCust(customer[StaticConfig.CustName][i],formula,"0",customer[StaticConfig.Trip][i],customer[StaticConfig.Sr][i],customer[StaticConfig.today][i],customer[StaticConfig.pre][i],
+                        customer[StaticConfig.total][i],customer[StaticConfig.remain][i]);
             }
         }
         CustlistofViews.put("Trip - 1",trip1);
@@ -188,20 +192,20 @@ public class Route_subView extends Fragment {
 
     }
 
-    public void addCust(String custName,String Balance,String paid,String trip,final String custid){
+    public void addCust(String custName,String Balance,String paid,String trip,final String custid,final String today,final String pre,final String total,final String remain){
 
         LayoutInflater vi = (LayoutInflater) rootView.getContext().getSystemService(rootView.getContext().LAYOUT_INFLATER_SERVICE);
         View view = vi.inflate(R.layout.route_customer_info, null);
 
         TextView txtcustname = view.findViewById(R.id.txt_customerName);
         TextView txtbalance = view.findViewById(R.id.txt_balance);
-        TextView txtpaid = view.findViewById(R.id.txt_Paid);
+
 
         txtcustname.setText(" " + custName);
-        txtbalance.setText(" RS: " + Balance);
-        txtpaid.setText(" RS: " + paid);
+        txtbalance.setText(" " + Balance);
 
-        Log.d("kd.greem", custName+Balance+paid);
+
+//        Log.d("kd.greem", custName+Balance+paid);
 
         LinearLayout linear = (LinearLayout) rootView.findViewById(R.id.firstlayout);
 
@@ -210,7 +214,7 @@ public class Route_subView extends Fragment {
             public void onClick(View v) {
                 InnerBgTask4CustDaily task = new InnerBgTask4CustDaily();
                 try {
-                    task.execute("getCustomers",custid).get();
+                    task.execute("getCustomers",custid,today,pre,total,remain).get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
@@ -311,11 +315,15 @@ public class Route_subView extends Fragment {
         }
     }
 
-    public void addCustDetails(String CustomerID,String [][] customer_daily){
+    public void addCustDetails(String CustomerID,String [][] customer_daily,String today,String pre,String total,String remain){
 
         Intent myIntent1 = new Intent(rootView.getContext(), Customerdailyproduct.class);
         myIntent1.putExtra("layout", R.layout.custdailyinfo);
         myIntent1.putExtra("Custid", CustomerID);
+        myIntent1.putExtra("today", today);
+        myIntent1.putExtra("pre", pre);
+        myIntent1.putExtra("total", total);
+        myIntent1.putExtra("remain", remain);
         Bundle mBundle = new Bundle();
 
         mBundle.putSerializable("custDaily", customer_daily);
@@ -331,7 +339,7 @@ public class Route_subView extends Fragment {
 
     class InnerBackgroundTask extends AsyncTask<String,Void,String[][]> {
         Context ctx;
-        private String[][] customer= new String[6][];
+        private String[][] customer= new String[11][];
 
         String url_cust_info ="http://avinashkumbhar.com/Dairy/getcustinfo.php";
         private boolean ifDataAvailble=false;
@@ -378,11 +386,13 @@ public class Route_subView extends Fragment {
                 Log.d("kd now", "in execut + getUser");
                 OutputStream os = httpURLConnection.getOutputStream();
 
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            /*String data= URLEncoder.encode("auth","UTF-8")+"="+URLEncoder.encode(auth,"UTF-8")+"&"+
-                    URLEncoder.encode("id","UTF-8")+"="+URLEncoder.encode(userid,"UTF-8");//+"&"+*/
+                String date1=new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-            /*bufferedWriter.write(data);*/
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            String data= URLEncoder.encode("Date","UTF-8")+"="+URLEncoder.encode(date1,"UTF-8");/*+"&"+*/
+                    /*URLEncoder.encode("id","UTF-8")+"="+URLEncoder.encode(userid,"UTF-8");*/
+
+            bufferedWriter.write(data);
                 bufferedWriter.flush();
                 bufferedWriter.close();
                 os.close();
@@ -411,8 +421,8 @@ public class Route_subView extends Fragment {
             JSONArray jsonArry = new JSONArray(finalResult);
 
 //            JSONObject jsonObj = new JSONObject(myJSON.substring(myJSON.indexOf("{"), myJSON.lastIndexOf("}") + 1));
-            Log.d("kd all JSON length", "" + jsonArry.length());
-            for(int k=0;k<6;k++)
+            Log.d("kd cust all JSON length", "" + jsonArry);
+            for(int k=0;k<11;k++)
                 customer[k] = new String[jsonArry.length()];
 
             for(int i=0;i<jsonArry.length();i++){
@@ -425,6 +435,13 @@ public class Route_subView extends Fragment {
                 customer[StaticConfig.Route][i]= c.getString("Route");
                 customer[StaticConfig.Priority][i]= c.getString("Priority");
                 customer[StaticConfig.Trip][i] = c.getString("Trip");
+                customer[StaticConfig.total][i] = c.getString("Total");
+                customer[StaticConfig.paid][i] = c.getString("Paid");
+                customer[StaticConfig.remain][i] = c.getString("Remain");
+                customer[StaticConfig.pre][i] = c.getString("Pre");
+                customer[StaticConfig.today][i] = c.getString("Todays");
+
+
                 //Log.d("kd data", "" + sr +" "+ CustName);
             }
 /*
@@ -456,6 +473,11 @@ public class Route_subView extends Fragment {
         Context ctx;
         private String[][] customer_daily = new String[10][];
         private String customerId="1";
+        private String today="*0";
+        private String pre="*0";
+        private String total="*0";
+        private String remain="*0";
+
         String url_cust_daily ="http://avinashkumbhar.com/Dairy/getCustomerDailyProdcut1.php";
         private boolean ifDataAvailble=false;
         private final ProgressDialog dialog = new ProgressDialog(getContext());
@@ -470,12 +492,14 @@ public class Route_subView extends Fragment {
 
         @Override
         protected String[][] doInBackground(String... params) {
-            Log.d("kd in daily", "little sure");
             if(!ifDataAvailble) {
                 String method = params[0];
                 if (method.equals("getCustomers")) {
                     customerId=params[1];
-                    Log.d("kd in daily", "sure");
+                    today = params[2];
+                    pre=params[3];
+                    total=params[4];
+                    remain =params[5];
                     return updateCustomers();
                 }
             }
@@ -534,13 +558,13 @@ public class Route_subView extends Fragment {
             JSONArray jsonArry = new JSONArray(finalResult);
 
 //            JSONObject jsonObj = new JSONObject(myJSON.substring(myJSON.indexOf("{"), myJSON.lastIndexOf("}") + 1));
-            Log.d("kd json len", "" + jsonArry.length());
+            //Log.d("kd json len", "" + jsonArry.length());
             for(int k=0;k<10;k++)
               customer_daily[k] = new String[jsonArry.length()];
 
             for(int i=0;i<jsonArry.length();i++){
                 JSONObject c = jsonArry.getJSONObject(i);
-                //Log.d("kd json ", "" + c.length());
+                //Log.d("kd.greem", "Customer data Length" + c.length());
 
                 customer_daily[StaticConfig.daily_Custname][i]= c.getString("Custname");
                 customer_daily[StaticConfig.daily_Category][i] = c.getString("Category");
@@ -574,7 +598,7 @@ public class Route_subView extends Fragment {
             super.onPostExecute(result);
             this.dialog.dismiss();
 //            setSpinnerValues();
-            addCustDetails(customerId,result);
+            addCustDetails(customerId,result,today,pre,total,remain);
             Log.d("kd.greem","in post execute r="+getRoutenum());
         }
     }

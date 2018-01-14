@@ -11,6 +11,12 @@ public final class StaticConfig {
     public static int Route =3;
     public static int Priority =4;
     public static int Trip =5;
+    public static int total =6;
+    public static int paid=7;
+    public static int remain =8;
+    public static int pre =9;
+    public static int today =10;
+
 
     public static int daily_Custname=0;
     public static int daily_Category=1;
