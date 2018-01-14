@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
@@ -53,6 +54,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
     private String today;
     private String total;
     private String remain;
+    DecimalFormat df = new DecimalFormat("#.000");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,7 +199,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
             txt_qty.setSelectAllOnFocus(true);
             txt_qty.setText(customer_daily[StaticConfig.daily_Qty][i]);
             final float rate = Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]);
-            final int currQty = Integer.valueOf(txt_qty.getText().toString());
+            final Float currQty = Float.valueOf(txt_qty.getText().toString());
             final float currAmt = Float.valueOf(currQty) * Float.valueOf(rate);
 
             txt_qty.addTextChangedListener(new TextWatcher() {
@@ -214,7 +216,8 @@ public class Customerdailyproduct extends AppCompatActivity  {
                         if(qty.trim().length()<=0){
                             qty="0";
                         }
-                        int thisqty = Integer.valueOf(qty);
+                        float thisqty = Float .valueOf(qty);
+
                         if(thisqty<currQty){
                             float change =(currQty-thisqty) *rate;
                             remainamount.setText(String.valueOf(Float.valueOf(remain) - change ));
@@ -232,12 +235,12 @@ public class Customerdailyproduct extends AppCompatActivity  {
                             today_lbl.setText(String.valueOf(Float.valueOf(today) ));
                             totalamount.setText(String.valueOf(Float.valueOf(total)));
                         }
-
                         //thisamt=Float.valueOf(qty) * Float.valueOf(rate);
-
                     }
                 }
             });
+
+
 
 
             txt_qty.setRawInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
