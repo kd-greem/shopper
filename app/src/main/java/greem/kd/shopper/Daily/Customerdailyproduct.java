@@ -55,6 +55,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
     private String total;
     private String remain;
     DecimalFormat df = new DecimalFormat("#.000");
+    private EditText paid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
         todayamt =Float.valueOf(today);
         remainamt =Float.valueOf(remain);
 
-        EditText paid= (EditText) findViewById(R.id.txt_paidamount);
+        paid= (EditText) findViewById(R.id.txt_paidamount);
         paid.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -160,6 +161,17 @@ public class Customerdailyproduct extends AppCompatActivity  {
                             }
                         }
 
+                    }
+
+                    //updating account_final table with today pre total and remain;
+                    InnerBgTask4CustUpdateValue task = new InnerBgTask4CustUpdateValue();
+                    try {
+                        task.execute("updateAccount",CustId, today_lbl.getText().toString(),pre_lbl.getText().toString(),
+                                totalamount.getText().toString(), paid.getText().toString(),remainamount.getText().toString()).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
 
                 }
@@ -241,8 +253,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
             });
 
 
-
-
             txt_qty.setRawInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
             txt_qty.setPadding(10, 5, 5, 5);
             txt_qty.setTextSize(16f);
@@ -256,9 +266,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
             hide.setText(customer_daily[StaticConfig.daily_MilkSr][i]);
             hide.setVisibility(View.GONE);
             tr.addView(hide,new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,TableRow.LayoutParams.WRAP_CONTENT, 0) );
-
         }
-
     }
 
     class InnerBgTask4CustUpdateValue extends AsyncTask<String,Void,String > {
@@ -266,6 +274,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
 //        private String[][] customer_daily = new String[10][];
         private String customerId="1";
         String url_cust_daily ="http://avinashkumbhar.com/Dairy/updateCustomerDaily.php";
+        String url_account_final ="http://avinashkumbhar.com/Dairy/updateaccountfinal.php";
         private boolean ifDataAvailble=false;
 
 
@@ -282,8 +291,11 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 String method = params[0];
                 if (method.equals("setCustomers")) {
                     customerId=params[1];
-                    Log.d("kd in daily", "sure");
                     return updateCustomers(params);
+                }
+                else if(method.equals("updateAccount")) {
+                    customerId=params[1];
+                    return updateAccount(params);
                 }
             }
             return "";
@@ -298,6 +310,69 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
             return null;
         }
+        private String updateAccount(String...param){
+
+            try {
+                return updateAccountInfo(param);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+        private String updateAccountInfo(String... param) throws JSONException {
+            String finalResult = "";
+
+            try {
+                URL url = new URL(url_account_final);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                OutputStream os = httpURLConnection.getOutputStream();
+
+                String date1=new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                String data= URLEncoder.encode("date","UTF-8")+"="+ URLEncoder.encode(date1,"UTF-8") +"&" +
+                        URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&" +
+
+                        URLEncoder.encode("todays","UTF-8")+"="+ URLEncoder.encode(param[2],"UTF-8") +"&" +
+                        URLEncoder.encode("pre","UTF-8")+"="+ URLEncoder.encode(param[3],"UTF-8") +"&" +
+                        URLEncoder.encode("total","UTF-8")+"="+ URLEncoder.encode(param[4],"UTF-8") +"&" +
+                        URLEncoder.encode("paid","UTF-8")+"="+ URLEncoder.encode(param[5],"UTF-8") +"&" +
+                        URLEncoder.encode("remain","UTF-8")+"="+ URLEncoder.encode(param[6],"UTF-8")
+                        ;
+
+                Log.d("kd.greem","Data Writing-"+ customerId +": "+ data);
+
+                bufferedWriter.write(data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                os.close();
+
+                InputStream IS = httpURLConnection.getInputStream();
+
+                BufferedReader rd = new BufferedReader(new InputStreamReader(IS));
+                StringBuilder sb = new StringBuilder("");
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    sb.append(line);
+                }
+                finalResult = sb.toString();
+
+                IS.close();
+
+//            return finalResult ;
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return "";
+        }
+
         private String getEmp_info(String... param) throws JSONException {
             String finalResult = "";
 
