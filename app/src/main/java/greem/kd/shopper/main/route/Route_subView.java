@@ -1,5 +1,6 @@
 package greem.kd.shopper.main.route;
 
+import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +45,8 @@ import greem.kd.shopper.Config.StaticConfig;
 import greem.kd.shopper.Daily.Customerdailyproduct;
 import greem.kd.shopper.R;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by kd on 17/12/17.
  */
@@ -53,6 +56,7 @@ public class Route_subView extends Fragment {
     private Spinner s;
     private HashMap<String,List<View>> CustlistofViews = new HashMap<>();
     public void setCustomer(String[][] customer) {
+        Route_subView.customer=null;
         Route_subView.customer = customer;
     }
     private List<View> trip1,trip2,trip3,trip4,trip5,trip6,trip7;
@@ -128,6 +132,14 @@ public class Route_subView extends Fragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("kd onactivityreulst","in OnActivityResult");
+        InnerBackgroundTask updateuser = new InnerBackgroundTask();
+        updateuser.execute("getCustomers");
+
+    }
 
     public void setSpinnerValues(){
         if(!routenum.equals("")){
@@ -175,6 +187,9 @@ public class Route_subView extends Fragment {
 
         List<String> listTrip = new ArrayList<>();
         String[] c=customer[StaticConfig.Route];
+
+        ClearTrips();
+
         for(int i=0;i<c.length;i++){
             if(c[i].equals(routenum)){
                 String formula="  " + customer[StaticConfig.total][i] +" + " + customer[StaticConfig.paid][i] +" = " + customer[StaticConfig.remain][i];
@@ -182,6 +197,8 @@ public class Route_subView extends Fragment {
                         customer[StaticConfig.total][i],customer[StaticConfig.remain][i]);
             }
         }
+
+        CustlistofViews.clear();
         CustlistofViews.put("Trip - 1",trip1);
         CustlistofViews.put("Trip - 2",trip2);
         CustlistofViews.put("Trip - 3",trip3);
@@ -190,6 +207,27 @@ public class Route_subView extends Fragment {
         CustlistofViews.put("Trip - 6",trip6);
         CustlistofViews.put("Trip - 7",trip7);
 
+    }
+
+    private void ClearTrips() {
+        LinearLayout linear = (LinearLayout) rootView.findViewById(R.id.firstlayout);
+        if(((LinearLayout) linear).getChildCount() > 0) {
+            Log.d("kd.greem","liner view has childs");
+            ((LinearLayout) linear).removeAllViews();
+
+        }else{
+            Log.d("kd.greem","liner view No Child");
+        }
+
+        trip1 =new ArrayList<View>();
+        trip2 =new ArrayList<View>();
+        trip3 =new ArrayList<View>();
+        trip4 =new ArrayList<View>();
+        trip5 =new ArrayList<View>();
+        trip6 =new ArrayList<View>();
+        trip7 =new ArrayList<View>();
+
+        rootView.invalidate();
     }
 
     public void addCust(String custName,String Balance,String paid,String trip,final String custid,final String today,final String pre,final String total,final String remain){
@@ -328,7 +366,7 @@ public class Route_subView extends Fragment {
 
         mBundle.putSerializable("custDaily", customer_daily);
         myIntent1.putExtras(mBundle);
-        startActivity(myIntent1);
+        startActivityForResult(myIntent1,2);
 
 //        LayoutInflater vi = (LayoutInflater) rootView.getContext().getSystemService(rootView.getContext().LAYOUT_INFLATER_SERVICE);
 //        LinearLayout linear = (LinearLayout) rootView.findViewById(R.id.firstlayout);
@@ -441,7 +479,6 @@ public class Route_subView extends Fragment {
                 customer[StaticConfig.pre][i] = c.getString("Pre");
                 customer[StaticConfig.today][i] = c.getString("Todays");
 
-
                 //Log.d("kd data", "" + sr +" "+ CustName);
             }
 /*
@@ -464,7 +501,7 @@ public class Route_subView extends Fragment {
             super.onPostExecute(result);
            setCustomer(result);
            setSpinnerValues();
-            setCustomerinfo();
+           setCustomerinfo();
            Log.d("kd.greem","in post execute r="+getRoutenum());
         }
     }
@@ -603,4 +640,3 @@ public class Route_subView extends Fragment {
         }
     }
 }
-

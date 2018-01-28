@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +57,6 @@ public class Routes extends Fragment {
                              Bundle savedInstanceState) {
         setRetainInstance(true);
         View rootView = inflater.inflate(R.layout.route_activity, container, false);
-
 
         TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.route_tabs);
         TabLayout.Tab tab_summary = tabLayout.newTab().setText("Route 1");
@@ -111,14 +111,15 @@ public class Routes extends Fragment {
         switch (index) {
             case 0:
                 // Top Rated fragment activity
-                Log.d("kd tab","adding tab");
+
                 return getRouteOne();
             case 1:
                 // Games fragment activity
-                return getRouteTwo();
 
+                return getRouteTwo();
             case 2:
                 // Movies fragment activity
+
                 return getRouteThree();
         }
 
@@ -167,127 +168,4 @@ public class Routes extends Fragment {
 
         return r3;
     }
-/*
-class InnerBackgroundTask extends AsyncTask<String,Void,String[][]> {
-         Context ctx;
-        private String[][] customer= new String[6][];
-
-         String url_cust_info ="http://avinashkumbhar.com/Dairy/getcustinfo.php";
-        private boolean ifDataAvailble=false;
-         private String sr;
-         private String CustName;
-         private String Contact;
-         private String Route;
-         private String Priority;
-         private String Trip;
-
-         @Override
-         protected void onPreExecute() {
-             super.onPreExecute();
-         }
-
-         @Override
-         protected String[][] doInBackground(String... params) {
-             if(!ifDataAvailble) {
-                 String method = params[0];
-                 if (method.equals("getCustomers")) {
-                     return updateCustomers();
-                 }
-             }
-             return customer;
-         }
-         private String[][] updateCustomers(){
-
-             try {
-                 return getEmp_info();
-             } catch (JSONException e) {
-                 e.printStackTrace();
-             }
-
-             return null;
-         }
-         private String[][] getEmp_info() throws JSONException {
-             String finalResult = "";
-
-             try {
-                 URL url = new URL(url_cust_info);
-                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                 httpURLConnection.setRequestMethod("POST");
-                 httpURLConnection.setDoOutput(true);
-                 Log.d("Kedar", "in execut + getUser");
-                 OutputStream os = httpURLConnection.getOutputStream();
-
-                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            *//*String data= URLEncoder.encode("auth","UTF-8")+"="+URLEncoder.encode(auth,"UTF-8")+"&"+
-                    URLEncoder.encode("id","UTF-8")+"="+URLEncoder.encode(userid,"UTF-8");//+"&"+*//*
-
-            *//*bufferedWriter.write(data);*//*
-                 bufferedWriter.flush();
-                 bufferedWriter.close();
-                 os.close();
-
-                 InputStream IS = httpURLConnection.getInputStream();
-
-                 BufferedReader rd = new BufferedReader(new InputStreamReader(IS));
-                 StringBuilder sb = new StringBuilder("");
-                 String line;
-                 while ((line = rd.readLine()) != null) {
-                     sb.append(line);
-                 }
-                 finalResult = sb.toString();
-
-                 //  Log.d("Customer info in JSON", finalResult);
-                 IS.close();
-
-//            return finalResult ;
-
-             } catch (MalformedURLException e) {
-                 e.printStackTrace();
-             } catch (IOException e) {
-                 e.printStackTrace();
-             }
-
-             JSONArray jsonArry = new JSONArray(finalResult);
-
-//            JSONObject jsonObj = new JSONObject(myJSON.substring(myJSON.indexOf("{"), myJSON.lastIndexOf("}") + 1));
-             Log.d("kd all JSON length", "" + jsonArry.length());
-             for(int k=0;k<6;k++)
-                 customer[k] = new String[jsonArry.length()];
-
-             for(int i=0;i<jsonArry.length();i++){
-                 JSONObject c = jsonArry.getJSONObject(i);
-                 //Log.d("kd json ", "" + c.length());
-
-                 customer[StaticConfig.Sr][i] = c.getString("Sr");
-                 customer[StaticConfig.CustName][i]= c.getString("Custname");
-                 customer[StaticConfig.Contact][i] = c.getString("Contact");
-                 customer[StaticConfig.Route][i]= c.getString("Route");
-                 customer[StaticConfig.Priority][i]= c.getString("Priority");
-                 customer[StaticConfig.Trip][i] = c.getString("Trip");
-                 //Log.d("kd data", "" + sr +" "+ CustName);
-             }
-*//*
-        ((Activity)ctx).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //stuff that updates ui
-                com.example.zs.voter_tracker.Set_Cast_Surenamewise.getInstant().setUser(contact1,description);
-            }
-        });*//*
-
-
-             return customer;
-         }
-         @Override
-         protected void onProgressUpdate(Void... values) {
-             super.onProgressUpdate(values);
-         }
-         @Override
-         protected void onPostExecute(String[][] result) {
-             super.onPostExecute(result);
-             r1.setCustomer(result);
-             r1.setSpinnerValues();
-             Log.d("kd.greem","in post execute r="+r.getRoutenum());
-         }
-     }*/
 }

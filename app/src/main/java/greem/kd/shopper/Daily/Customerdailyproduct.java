@@ -1,6 +1,8 @@
 package greem.kd.shopper.Daily;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +18,7 @@ import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -57,18 +61,43 @@ public class Customerdailyproduct extends AppCompatActivity  {
     DecimalFormat df = new DecimalFormat("#.000");
     private EditText paid;
 
+    private Button EditBtn;
+    private Button btn_save;
+    private float todaystotalamountInit=0;
+
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.d("kd","back pressed");
+        Intent intent=new Intent();
+        setResult(2,intent);
+        finish();//finishing activity
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         /*getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         setContentView(R.layout.custdailyinfo);
+        overridePendingTransition(R.anim.from_middle, R.anim.to_middle);
         Bundle extras = getIntent().getExtras();
         final String CustId=getIntent().getStringExtra("Custid");
         today=getIntent().getStringExtra("today");
         String pre=getIntent().getStringExtra("pre");
         total=getIntent().getStringExtra("total");
         remain=getIntent().getStringExtra("remain");
+
+        EditBtn = (Button) findViewById(R.id.btn_edit);
+
+        EditBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EnableEdit(true);
+            }
+        });
 
         final String[][] customer_daily = (String[][]) extras.getSerializable("custDaily");
 
@@ -130,11 +159,14 @@ public class Customerdailyproduct extends AppCompatActivity  {
         });
         setProducts(customer_daily);
 
-        Button btn = (Button) findViewById(R.id.button);
-        btn.setOnClickListener(new View.OnClickListener() {
+        btn_save = (Button) findViewById(R.id.button2);
+        btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //do save page here
+                Toast.makeText(Customerdailyproduct.this,"Saving Changes ! Please wait !",Toast.LENGTH_SHORT).show();
+
+                EnableEdit(false);
                 for(int c=1; c<tl.getChildCount();c++){
                     TableRow row = (TableRow)tl.getChildAt(c);
                     Log.d("kd.greem"," table row childs are "+row.getChildCount());
@@ -175,11 +207,41 @@ public class Customerdailyproduct extends AppCompatActivity  {
                     }
 
                 }
-
+                Toast.makeText(Customerdailyproduct.this,"Changes Saved !",Toast.LENGTH_SHORT).show();
             }
         });
 
+        //setting all editable to false;
+        EnableEdit(false);
+
     }
+
+    private void EnableEdit(boolean flag){
+
+        /*paid.setFocusable(flag);
+        paid.setClickable(flag);
+        btn_save.setEnabled(flag);
+        EditBtn.setEnabled(!flag);
+        for(int c=1; c<tl.getChildCount();c++){
+            TableRow row = (TableRow)tl.getChildAt(c);
+            EditText qty1 = (EditText) row.getChildAt(1);
+            qty1.setClickable(flag);
+            qty1.setFocusable(flag);
+
+        }*/
+
+        paid.setEnabled(flag);
+        btn_save.setEnabled(flag);
+        EditBtn.setEnabled(!flag);
+        for(int c=1; c<tl.getChildCount();c++){
+            TableRow row = (TableRow)tl.getChildAt(c);
+            EditText qty1 = (EditText) row.getChildAt(1);
+            qty1.setEnabled(flag);
+
+        }
+
+    }
+
 
     private void setProducts(final String [][] customer_daily){
 
@@ -213,7 +275,9 @@ public class Customerdailyproduct extends AppCompatActivity  {
             final float rate = Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]);
             final Float currQty = Float.valueOf(txt_qty.getText().toString());
             final float currAmt = Float.valueOf(currQty) * Float.valueOf(rate);
-
+            
+            todaystotalamountInit+=currAmt;
+            
             txt_qty.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -235,7 +299,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
                             remainamount.setText(String.valueOf(Float.valueOf(remain) - change ));
                             today_lbl.setText(String.valueOf(Float.valueOf(today)-change ));
                             totalamount.setText(String.valueOf(Float.valueOf(total)-change ));
-
                         }else if (thisqty>currQty){
 
                             float change =(thisqty-currQty) *rate;
@@ -266,6 +329,15 @@ public class Customerdailyproduct extends AppCompatActivity  {
             hide.setText(customer_daily[StaticConfig.daily_MilkSr][i]);
             hide.setVisibility(View.GONE);
             tr.addView(hide,new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,TableRow.LayoutParams.WRAP_CONTENT, 0) );
+        }
+
+        if(Float.valueOf(today) ==0) {
+            remain=String.valueOf(Float.valueOf(remain) + todaystotalamountInit);
+            today =String.valueOf(Float.valueOf(today) + todaystotalamountInit);
+            total=String.valueOf(Float.valueOf(total) + todaystotalamountInit);
+            remainamount.setText(String.valueOf(Float.valueOf(remain) ));
+            today_lbl.setText(String.valueOf(Float.valueOf(today)));
+            totalamount.setText(String.valueOf(Float.valueOf(total)));
         }
     }
 
