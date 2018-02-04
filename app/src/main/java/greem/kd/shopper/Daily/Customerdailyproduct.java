@@ -112,7 +112,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
         pre=getIntent().getStringExtra("pre");
         total=getIntent().getStringExtra("total");
         remain=getIntent().getStringExtra("remain");
-        df.setRoundingMode(RoundingMode.CEILING);
+        df.setRoundingMode(RoundingMode.HALF_UP);
 
         gl_date=getIntent().getStringExtra("Date");
 
@@ -144,24 +144,24 @@ public class Customerdailyproduct extends AppCompatActivity  {
         ((TextView)findViewById(R.id.txt_custname_1)).setText(custName);
 
         today_lbl=(TextView)findViewById(R.id.txt_today);
-        today_lbl.setText( today);
+        today_lbl.setText(String.valueOf(df.format(Float.valueOf(today))));
         pre_lbl=(TextView)findViewById(R.id.txt_pre);
-        pre_lbl.setText(   pre);
+        pre_lbl.setText(String.valueOf(df.format(Float.valueOf(pre))));
 
         tl = (TableLayout) findViewById(R.id.table1);
 
         // Create the table row
 
         totalamount=(TextView) findViewById(R.id.lbl_totalAmount);
-        totalamount.setText(total);
+        totalamount.setText(String.valueOf(df.format(Float.valueOf(total))));
 
         remainamount = (TextView) findViewById(R.id.lbl_remainAmount);
-        remainamount.setText(remain);
+        remainamount.setText(String.valueOf(df.format(Float.valueOf(remain))));
 
 
-        totalamt = Float.valueOf(totalamount.getText().toString());
-        todayamt =Float.valueOf(today);
-        remainamt =Float.valueOf(remain);
+        totalamt =new Float(df.format(Float.valueOf(total)));
+        todayamt =new Float(df.format(Float.valueOf(today)));
+        remainamt =new Float(df.format(Float.valueOf(remain)));
 
         paid= (EditText) findViewById(R.id.txt_paidamount);
         paid.addTextChangedListener(new TextWatcher() {
@@ -177,12 +177,13 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
             @Override
             public void afterTextChanged(Editable s) {
+                float totalhere = new Float(df.format(Float.valueOf(totalamount.getText().toString())));
                 if(s.length()>0) {
-                    Float subamount=totalamt - Float.valueOf(s.toString());
-                    if(subamount<=0f){
-                        subamount=0f;
-                    }
+                    Float subamount= totalhere - Float.valueOf(s.toString());
                     remainamount.setText(String.valueOf(df.format(subamount)));
+                }
+                if(s.length()==0){
+                    remainamount.setText(String.valueOf(df.format(totalhere )));
                 }
             }
         });
@@ -213,7 +214,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
                             InnerBgTask4CustUpdateValue task = new InnerBgTask4CustUpdateValue();
                             try {
                                 task.execute("setCustomers",CustId, customer_daily[StaticConfig.daily_MilkSr][i],qty1.getText().toString(),
-                                        customer_daily[StaticConfig.daily_Rate][i], String.valueOf(Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]) * Float.valueOf(qty1.getText().toString())),
+                                        customer_daily[StaticConfig.daily_Rate][i], String.valueOf(new Float(df.format(Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]) * Float.valueOf(qty1.getText().toString())))),
                                         customer_daily[StaticConfig.daily_route][i],customer_daily[StaticConfig.daily_trip][i]).get();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -323,9 +324,9 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
             txt_qty.setSelectAllOnFocus(true);
             txt_qty.setText(customer_daily[StaticConfig.daily_Qty][i]);
-            final float rate = Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]);
-            final Float currQty = Float.valueOf(txt_qty.getText().toString());
-            final float currAmt = Float.valueOf(currQty) * Float.valueOf(rate);
+            final float rate = new Float(df.format(Float.valueOf(customer_daily[StaticConfig.daily_Rate][i])));
+            final float currQty = new Float(df.format(Float.valueOf(txt_qty.getText().toString())));
+            final float currAmt = new Float(df.format(Float.valueOf(currQty) * Float.valueOf(rate)));
             
             todaystotalamountInit+=currAmt;
             
@@ -338,12 +339,14 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 }
                 @Override
                 public void afterTextChanged(Editable s) {
+
                     if(s.length()>=0) {
                         String qty = txt_qty.getText().toString();
                         if(qty.trim().length()<=0){
                             qty="0";
-                        }
-                        float thisqty = Float .valueOf(qty);
+                    }
+
+                        float thisqty = Float.valueOf(qty);
 
                         if(thisqty<currQty){
                             float change =(currQty-thisqty) *rate;
