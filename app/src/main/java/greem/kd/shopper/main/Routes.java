@@ -119,7 +119,6 @@ public class Routes extends Fragment {
                 return getRouteTwo();
             case 2:
                 // Movies fragment activity
-
                 return getRouteThree();
         }
 

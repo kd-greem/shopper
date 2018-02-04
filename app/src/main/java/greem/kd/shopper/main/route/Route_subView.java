@@ -138,7 +138,6 @@ public class Route_subView extends Fragment {
         Log.d("kd onactivityreulst","in OnActivityResult");
         InnerBackgroundTask updateuser = new InnerBackgroundTask();
         updateuser.execute("getCustomers");
-
     }
 
     public void setSpinnerValues(){
@@ -252,7 +251,8 @@ public class Route_subView extends Fragment {
             public void onClick(View v) {
                 InnerBgTask4CustDaily task = new InnerBgTask4CustDaily();
                 try {
-                    task.execute("getCustomers",custid,today,pre,total,remain).get();
+                    String gl_date=new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+                    task.execute("getCustomers",custid,today,pre,total,remain,gl_date).get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
@@ -355,13 +355,19 @@ public class Route_subView extends Fragment {
 
     public void addCustDetails(String CustomerID,String [][] customer_daily,String today,String pre,String total,String remain){
 
+        Customerdailyproduct.datepointer=0;
+        Customerdailyproduct.from="";
+        String gl_date=new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
         Intent myIntent1 = new Intent(rootView.getContext(), Customerdailyproduct.class);
+
         myIntent1.putExtra("layout", R.layout.custdailyinfo);
         myIntent1.putExtra("Custid", CustomerID);
         myIntent1.putExtra("today", today);
         myIntent1.putExtra("pre", pre);
         myIntent1.putExtra("total", total);
         myIntent1.putExtra("remain", remain);
+        myIntent1.putExtra("Date",gl_date);
+
         Bundle mBundle = new Bundle();
 
         mBundle.putSerializable("custDaily", customer_daily);
@@ -427,7 +433,7 @@ public class Route_subView extends Fragment {
                 String date1=new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            String data= URLEncoder.encode("Date","UTF-8")+"="+URLEncoder.encode(date1,"UTF-8");/*+"&"+*/
+                String data= URLEncoder.encode("Date","UTF-8")+"="+URLEncoder.encode(date1,"UTF-8");/*+"&"+*/
                     /*URLEncoder.encode("id","UTF-8")+"="+URLEncoder.encode(userid,"UTF-8");*/
 
             bufferedWriter.write(data);
@@ -560,7 +566,6 @@ public class Route_subView extends Fragment {
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoOutput(true);
-                Log.d("kd now", "in execut cust  daily");
                 OutputStream os = httpURLConnection.getOutputStream();
 
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -580,8 +585,7 @@ public class Route_subView extends Fragment {
                     sb.append(line);
                 }
                 finalResult = sb.toString();
-
-                  Log.d("Customer info in JSON", finalResult);
+                Log.d("Customer info in JSON", finalResult);
                 IS.close();
 
 //            return finalResult ;
@@ -613,7 +617,6 @@ public class Route_subView extends Fragment {
                 customer_daily[StaticConfig.daily_trip][i] = c.getString("Trip");
                 customer_daily[StaticConfig.daily_Contact][i] = c.getString("Contact");
                 customer_daily[StaticConfig.daily_MilkSr][i] = c.getString("Sr");
-                //Log.d("kd data", "" + sr +" "+ CustName);
             }
 /*
         ((Activity)ctx).runOnUiThread(new Runnable() {
@@ -634,9 +637,7 @@ public class Route_subView extends Fragment {
         protected void onPostExecute(String[][] result) {
             super.onPostExecute(result);
             this.dialog.dismiss();
-//            setSpinnerValues();
             addCustDetails(customerId,result,today,pre,total,remain);
-            Log.d("kd.greem","in post execute r="+getRoutenum());
         }
     }
 }
