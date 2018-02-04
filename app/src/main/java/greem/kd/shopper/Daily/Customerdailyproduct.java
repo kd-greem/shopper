@@ -661,8 +661,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
         private boolean ifDataAvailble=false;
 
-
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -710,7 +708,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                 String data= URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&"+
                 URLEncoder.encode("date1","UTF-8")+"="+URLEncoder.encode(gl_date,"UTF-8");
-                
+
                 bufferedWriter.write(data);
                 bufferedWriter.flush();
                 bufferedWriter.close();

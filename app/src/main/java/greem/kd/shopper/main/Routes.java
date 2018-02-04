@@ -62,10 +62,12 @@ public class Routes extends Fragment {
         TabLayout.Tab tab_summary = tabLayout.newTab().setText("Route 1");
         TabLayout.Tab tab_routes = tabLayout.newTab().setText("Route 2");
         TabLayout.Tab tab_customer = tabLayout.newTab().setText("Route 3");
+        TabLayout.Tab tab_route4 = tabLayout.newTab().setText("Route 4");
 
         tabLayout.addTab(tab_summary);
         tabLayout.addTab(tab_routes);
         tabLayout.addTab(tab_customer);
+        tabLayout.addTab(tab_route4);
 
 
         viewPager = (ViewPager) rootView.findViewById(R.id.route_viewpager);
@@ -89,7 +91,7 @@ public class Routes extends Fragment {
             }
         });
 
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(4);
 
         return rootView;
     }
@@ -98,9 +100,10 @@ public class Routes extends Fragment {
 }
 
  class TabsPagerAdapterRoute extends FragmentPagerAdapter {
-      Route_subView r1,r2,r3;
+      Route_subView r1,r2,r3,r4;
 
-    public TabsPagerAdapterRoute(FragmentManager fm) {
+
+     public TabsPagerAdapterRoute(FragmentManager fm) {
         super(fm);
 
     }
@@ -120,6 +123,8 @@ public class Routes extends Fragment {
             case 2:
                 // Movies fragment activity
                 return getRouteThree();
+            case 3:
+                return getRouteFour();
         }
 
         return null;
@@ -128,7 +133,7 @@ public class Routes extends Fragment {
     @Override
     public int getCount() {
         // get item count - equal to number of tabs
-        return 3;
+        return 4;
     }
 
     public Fragment getRouteOne(){
@@ -167,4 +172,16 @@ public class Routes extends Fragment {
 
         return r3;
     }
+    public Fragment getRouteFour(){
+         if(r4!=null){
+             return r4;
+         }
+
+         r4 = new Route_subView();
+         r4.setRoutenum(4);
+        /*InnerBackgroundTask updateuser = new InnerBackgroundTask();
+        updateuser.execute("getCustomers");*/
+
+         return r4;
+     }
 }

@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +49,8 @@ import greem.kd.shopper.Daily.Customerdailyproduct;
 import greem.kd.shopper.R;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
+import static greem.kd.shopper.Config.StaticConfig.PREFS_NAME;
 
 /**
  * Created by kd on 17/12/17.
@@ -54,7 +59,11 @@ import static android.app.Activity.RESULT_OK;
 public class Route_subView extends Fragment {
 
     private Spinner s;
+
     private HashMap<String,List<View>> CustlistofViews = new HashMap<>();
+    private Context currContext=null;
+    private static SharedPreferences mPrefs ;
+
     public void setCustomer(String[][] customer) {
         Route_subView.customer=null;
         Route_subView.customer = customer;
@@ -81,6 +90,9 @@ public class Route_subView extends Fragment {
             case 3:
                 this.routenum = "Route - 3";
                 break;
+            case 4:
+                this.routenum = "Route - 4";
+                break;
         }
 
     }
@@ -102,6 +114,15 @@ public class Route_subView extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.sub_route_layout, container, false);
         this.arraySpinner = new ArrayList<>();
+        this.currContext = getContext();
+        /*
+        mPrefs= currContext.getSharedPreferences(PREFS_NAME, 0);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("customerobj", "");
+        String [] [] custObj= gson.fromJson(json, String[][].class);
+
+        */
+
 /*
         this.arraySpinner.add("a");
         this.arraySpinner.add("b");
@@ -128,6 +149,18 @@ public class Route_subView extends Fragment {
         InnerBackgroundTask updateuser = new InnerBackgroundTask();
         updateuser.execute("getCustomers");
 
+        /*
+        if(custObj ==null){
+            InnerBackgroundTask updateuser = new InnerBackgroundTask();
+            updateuser.execute("getCustomers");
+
+        }else{
+            Log.d("greem", "getting from cache");
+            setCustomer(custObj);
+            setSpinnerValues();
+            setCustomerinfo();
+        }
+        */
         return rootView;
 
     }
@@ -240,7 +273,6 @@ public class Route_subView extends Fragment {
 
         txtcustname.setText(" " + custName);
         txtbalance.setText(" " + Balance);
-
 
 //        Log.d("kd.greem", custName+Balance+paid);
 
@@ -504,10 +536,20 @@ public class Route_subView extends Fragment {
         }
         @Override
         protected void onPostExecute(String[][] result) {
-            super.onPostExecute(result);
-           setCustomer(result);
-           setSpinnerValues();
+           super.onPostExecute(result);
+
+           //cache code...
+
+           /*SharedPreferences.Editor prefsEditor = mPrefs.edit();
+           Gson gson = new Gson();
+           String json = gson.toJson(result);
+           prefsEditor.putString("customerobj", json);
+           prefsEditor.commit();*/
+
+            setCustomer(result);
+            setSpinnerValues();
            setCustomerinfo();
+
            Log.d("kd.greem","in post execute r="+getRoutenum());
         }
     }

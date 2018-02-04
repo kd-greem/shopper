@@ -29,7 +29,6 @@ public final class StaticConfig {
     public static int daily_Contact=8;
     public static int daily_MilkSr=9;
 
-
-
+    public static final String PREFS_NAME = "MyPrefsFile";
 
 }
