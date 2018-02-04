@@ -212,8 +212,13 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
                         if(bid.equals(customer_daily[StaticConfig.daily_MilkSr][i])){
                             InnerBgTask4CustUpdateValue task = new InnerBgTask4CustUpdateValue();
+                            String methodName="setCustomers";
+                            if(datepointer>0){
+                                methodName="updatenew";
+                            }
+
                             try {
-                                task.execute("setCustomers",CustId, customer_daily[StaticConfig.daily_MilkSr][i],qty1.getText().toString(),
+                                task.execute(methodName,CustId, customer_daily[StaticConfig.daily_MilkSr][i],qty1.getText().toString(),
                                         customer_daily[StaticConfig.daily_Rate][i], String.valueOf(new Float(df.format(Float.valueOf(customer_daily[StaticConfig.daily_Rate][i]) * Float.valueOf(qty1.getText().toString())))),
                                         customer_daily[StaticConfig.daily_route][i],customer_daily[StaticConfig.daily_trip][i]).get();
                             } catch (InterruptedException e) {
@@ -401,6 +406,8 @@ public class Customerdailyproduct extends AppCompatActivity  {
         private String customerId="1";
         String url_cust_daily ="http://avinashkumbhar.com/Dairy/updateCustomerDaily.php";
         String url_account_final ="http://avinashkumbhar.com/Dairy/updateaccountfinal.php";
+        String url_cust_daily4Newdate = "http://avinashkumbhar.com/Dairy/updateCustomerDaily4new.php";
+
         private boolean ifDataAvailble=false;
 
 
@@ -422,6 +429,10 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 else if(method.equals("updateAccount")) {
                     customerId=params[1];
                     return updateAccount(params);
+                }else if(method.equals("updatenew")){
+                    url_cust_daily=url_cust_daily4Newdate;
+                    customerId=params[1];
+                    return updateCustomers(params);
                 }
             }
             return "";
@@ -559,7 +570,6 @@ public class Customerdailyproduct extends AppCompatActivity  {
         @Override
         protected void onPostExecute(String  result) {
             super.onPostExecute(result);
-
         }
     }
 
@@ -648,6 +658,7 @@ public class Customerdailyproduct extends AppCompatActivity  {
         private String remain="*0";
         private String gl_date;
         String url_cust_daily ="http://avinashkumbhar.com/Dairy/getCustomerDailyProdcut1.php";
+
         private boolean ifDataAvailble=false;
 
 
@@ -694,9 +705,12 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 httpURLConnection.setDoOutput(true);
                 OutputStream os = httpURLConnection.getOutputStream();
 
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                String data= URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8");
+                Log.d("greem",gl_date);
 
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                String data= URLEncoder.encode("custid","UTF-8")+"="+ URLEncoder.encode(customerId,"UTF-8") +"&"+
+                URLEncoder.encode("date1","UTF-8")+"="+URLEncoder.encode(gl_date,"UTF-8");
+                
                 bufferedWriter.write(data);
                 bufferedWriter.flush();
                 bufferedWriter.close();
