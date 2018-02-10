@@ -19,7 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -363,7 +363,6 @@ public class Route_subView extends Fragment {
         if(((LinearLayout) linear).getChildCount() > 0) {
             Log.d("kd.greem","liner view has childs");
             ((LinearLayout) linear).removeAllViews();
-
         }else{
             Log.d("kd.greem","liner view No Child");
         }
@@ -556,7 +555,7 @@ public class Route_subView extends Fragment {
 
     class InnerBgTask4CustDaily extends AsyncTask<String,Void,String[][]> {
         Context ctx;
-        private String[][] customer_daily = new String[10][];
+        private String[][] customer_daily = new String[11][];
         private String customerId="1";
         private String today="*0";
         private String pre="*0";
@@ -642,7 +641,7 @@ public class Route_subView extends Fragment {
 
 //            JSONObject jsonObj = new JSONObject(myJSON.substring(myJSON.indexOf("{"), myJSON.lastIndexOf("}") + 1));
             //Log.d("kd json len", "" + jsonArry.length());
-            for(int k=0;k<10;k++)
+            for(int k=0;k<11;k++)
               customer_daily[k] = new String[jsonArry.length()];
 
             for(int i=0;i<jsonArry.length();i++){
@@ -659,6 +658,7 @@ public class Route_subView extends Fragment {
                 customer_daily[StaticConfig.daily_trip][i] = c.getString("Trip");
                 customer_daily[StaticConfig.daily_Contact][i] = c.getString("Contact");
                 customer_daily[StaticConfig.daily_MilkSr][i] = c.getString("Sr");
+                customer_daily[StaticConfig.daily_Btype][i] = c.getString("BType");
             }
 /*
         ((Activity)ctx).runOnUiThread(new Runnable() {

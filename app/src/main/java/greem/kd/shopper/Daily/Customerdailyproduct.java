@@ -14,8 +14,12 @@ import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -39,8 +43,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import greem.kd.shopper.Config.StaticConfig;
@@ -77,6 +84,12 @@ public class Customerdailyproduct extends AppCompatActivity  {
     private String CustId;
     private String pre;
 
+    private List<String> arraySpinner = new ArrayList<>();
+    private ArrayAdapter<String> adapter=null;
+
+    private Spinner s;
+    private String[][] customer_daily,customer_dailyMilk, customer_dailyBtype;
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -106,6 +119,29 @@ public class Customerdailyproduct extends AppCompatActivity  {
         }else if(from.equals("right")) {
             overridePendingTransition(R.anim.enter_from_left, R.anim.exit_out_right);
         }
+
+        s = (Spinner) findViewById(R.id.spinnerMilk);
+        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item, arraySpinner);
+        adapter.add("All Category");
+        adapter.add("Milk");
+        adapter.add("By-Product");
+
+        s.setAdapter(adapter);
+        s.setSelection(0);
+        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                ResetCustView(s.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
+
         Bundle extras = getIntent().getExtras();
         CustId=getIntent().getStringExtra("Custid");
         today=getIntent().getStringExtra("today");
@@ -125,7 +161,8 @@ public class Customerdailyproduct extends AppCompatActivity  {
             }
         });
 
-        final String[][] customer_daily = (String[][]) extras.getSerializable("custDaily");
+        customer_daily = (String[][]) extras.getSerializable("custDaily");
+
 
         Log.d("kd.greem",""+customer_daily[0].length);
         //Log.d("kd.greem",""+customer_daily[0][0].length());
@@ -148,9 +185,10 @@ public class Customerdailyproduct extends AppCompatActivity  {
         pre_lbl=(TextView)findViewById(R.id.txt_pre);
         pre_lbl.setText(String.valueOf(df.format(Float.valueOf(pre))));
 
+        // Create the table
         tl = (TableLayout) findViewById(R.id.table1);
 
-        // Create the table row
+
 
         totalamount=(TextView) findViewById(R.id.lbl_totalAmount);
         totalamount.setText(String.valueOf(df.format(Float.valueOf(total))));
@@ -187,7 +225,44 @@ public class Customerdailyproduct extends AppCompatActivity  {
                 }
             }
         });
+
         setProducts(customer_daily);
+        // separating byproduct and Milk - - - -
+        int custLen = customer_daily[StaticConfig.daily_Sub_Category].length;
+        String[][] customer_dailyMilktemp = new String[customer_daily.length][custLen];
+        String[][] customer_dailyBtypetemp  = new String[customer_daily.length][custLen];
+        int milkcount = 0;
+        int bycount = 0;
+
+        for (int i=0;i<custLen;i++) {
+            if (customer_daily[StaticConfig.daily_Btype][i].trim().toLowerCase().equals("milk")) {
+                for(int k=0;k<customer_daily.length;k++){
+                    customer_dailyMilktemp[k][milkcount]=customer_daily[k][i];
+                }
+                milkcount++;
+            } else if (customer_daily[StaticConfig.daily_Btype][i].trim().toLowerCase().equals("bi-product")) {
+                for(int k=0;k<customer_daily.length;k++){
+                    customer_dailyBtypetemp[k][bycount]=customer_daily[k][i];
+                }
+                bycount++;
+            }
+        }
+
+        customer_dailyBtype = new String[customer_dailyBtypetemp.length][bycount];
+        customer_dailyMilk = new String[customer_dailyMilktemp.length][milkcount];
+
+        for(int i=0;i<milkcount;i++) {
+            for (int k = 0; k < customer_dailyMilktemp.length; k++) {
+                customer_dailyMilk[k][i] = customer_dailyMilktemp[k][i];
+            }
+        }
+        for(int i=0;i<bycount;i++) {
+            for (int k = 0; k < customer_dailyBtypetemp.length; k++) {
+                customer_dailyBtype[k][i] = customer_dailyBtypetemp[k][i];
+            }
+        }
+        customer_dailyBtypetemp=null;
+        customer_dailyMilktemp=null;
 
         btn_save = (Button) findViewById(R.id.button2);
         btn_save.setOnClickListener(new View.OnClickListener() {
@@ -250,6 +325,21 @@ public class Customerdailyproduct extends AppCompatActivity  {
         EnableEdit(false);
 
     }
+
+
+    public void ResetCustView(String type){
+        if(type.equals("") || type.equals("All Category")){
+            setProducts(customer_daily);
+        }else if(type.equals("Milk")){
+            setProducts(customer_dailyMilk);
+        } else if(type.equals("By-Product") ){
+            setProducts(customer_dailyBtype);
+        }
+    }
+
+
+
+
     public void addCustDetails(String gl_date, String CustomerID,String [][] customer_daily,String today,String pre,String total,String remain){
 
         Intent myIntent1 = new Intent(getBaseContext(), Customerdailyproduct.class);
@@ -301,6 +391,11 @@ public class Customerdailyproduct extends AppCompatActivity  {
 
 
     private void setProducts(final String [][] customer_daily){
+
+        //tl.removeAllViews();
+
+        while (tl.getChildCount() > 1)
+            tl.removeView(tl.getChildAt(tl.getChildCount() - 1));
 
         for(int i=0;i<customer_daily[StaticConfig.daily_Custname].length;i++){
 
